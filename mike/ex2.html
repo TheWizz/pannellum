@@ -1,0 +1,72 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pannellum</title>
+  <link type="text/css" rel="Stylesheet" href="../src/css/pannellum.css"/>
+  <link type="text/css" rel="Stylesheet" href="../src/standalone/standalone.css"/>
+	<!--script type="text/javascript" src="../build/pannellum.js"></script-->
+	<script type="text/javascript" src="../src/js/libpannellum.js"></script>
+	<script type="text/javascript" src="../src/js/pannellum.js"></script>
+	<style>
+		.custom-hotspot {
+			width: 200px;
+			height: 50px;
+			background-color: red;
+		}
+		.pnlm-container {
+			background: none;
+		}
+		.pnlm-load-box, .pnlm-load-box>* {
+			display: none !important;
+		}
+	</style>
+</head>
+<body>
+<div id="container" style="width=100%; height=100%;">
+</div>
+<script>
+// Create viewer
+const config = {
+    "type": "equirectangular",
+    "panorama": "../examples/examplepano.jpg",
+	autoLoad: true,
+    "hotSpots": [
+        {
+            "pitch": 14.1,
+            "yaw": 1.5,
+            "cssClass": "custom-hotspot",
+            "createTooltipFunc": hotspot,
+            "createTooltipArgs": "Baltimore Museum of Art"
+        },
+        {
+            "pitch": -9.4,
+            "yaw": 222.6,
+            "cssClass": "custom-hotspot",
+            "createTooltipFunc": hotspot,
+            "createTooltipArgs": "Art Museum Drive"
+        },
+        {
+            "pitch": -0.9,
+            "yaw": 144.4,
+            "cssClass": "custom-hotspot",
+            "createTooltipFunc": hotspot,
+            "createTooltipArgs": "North Charles Street"
+        }
+    ]
+};
+const viewer = pannellum.viewer('container', config);
+
+// Hot spot creation function
+function hotspot(hotSpotDiv, args) {
+    const span = document.createElement('span');
+    span.innerHTML = args;
+    hotSpotDiv.appendChild(span);
+    // span.style.width = span.scrollWidth - 20 + 'px';
+    // span.style.marginLeft = -(span.scrollWidth - hotSpotDiv.offsetWidth) / 2 + 'px';
+    // span.style.marginTop = -span.scrollHeight - 12 + 'px';
+}
+</script>
+</body>
+</html>

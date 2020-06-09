@@ -1,17 +1,17 @@
 /*
  * Pannellum - An HTML5 based Panorama Viewer
  * Copyright (c) 2011-2020 Matthew Petroff
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -255,7 +255,7 @@ controls.orientation.addEventListener('touchstart', function(e) {e.stopPropagati
 controls.orientation.addEventListener('pointerdown', function(e) {e.stopPropagation();});
 controls.orientation.className = 'pnlm-orientation-button pnlm-orientation-button-inactive pnlm-sprite pnlm-controls pnlm-control';
 var orientationSupport = false;
-if (window.DeviceOrientationEvent && location.protocol == 'https:' &&
+if (window.DeviceOrientationEvent && location.protocol === 'https:' &&
     navigator.userAgent.toLowerCase().indexOf('mobi') >= 0) {
     // This user agent check is here because there's no way to check if a
     // device has an inertia measurement unit. We used to be able to check if a
@@ -292,7 +292,7 @@ function init() {
     // Based on: http://stackoverflow.com/a/10965203
     var div = document.createElement("div");
     div.innerHTML = "<!--[if lte IE 9]><i></i><![endif]-->";
-    if (div.getElementsByTagName("i").length == 1) {
+    if (div.getElementsByTagName("i").length === 1) {
         anError();
         return;
     }
@@ -301,8 +301,8 @@ function init() {
     origPitch = config.pitch;
 
     var i, p;
-    
-    if (config.type == 'cubemap') {
+
+    if (config.type === 'cubemap') {
         panoImage = [];
         for (i = 0; i < 6; i++) {
             panoImage.push(new Image());
@@ -310,7 +310,7 @@ function init() {
         }
         infoDisplay.load.lbox.style.display = 'block';
         infoDisplay.load.lbar.style.display = 'none';
-    } else if (config.type == 'multires') {
+    } else if (config.type === 'multires') {
         var c = JSON.parse(JSON.stringify(config.multiRes));    // Deep copy
         // Avoid "undefined" in path, check (optional) multiRes.basePath, too
         // Use only multiRes.basePath if it's an absolute URL
@@ -336,24 +336,24 @@ function init() {
     }
 
     // Configure image loading
-    if (config.type == 'cubemap') {
+    if (config.type === 'cubemap') {
         // Quick loading counter for synchronous loading
         var itemsToLoad = 6;
-        
+
         var onLoad = function() {
             itemsToLoad--;
             if (itemsToLoad === 0) {
                 onImageLoad();
             }
         };
-        
+
         var onError = function(e) {
             var a = document.createElement('a');
             a.href = e.target.src;
             a.textContent = a.href;
             anError(config.strings.fileAccessError.replace('%s', a.outerHTML));
         };
-        
+
         for (i = 0; i < panoImage.length; i++) {
             p = config.cubeMap[i];
             if (p == "null") { // support partial cubemap image with explicitly empty faces
@@ -368,23 +368,23 @@ function init() {
                 panoImage[i].src = sanitizeURL(p);
             }
         }
-    } else if (config.type == 'multires') {
+    } else if (config.type === 'multires') {
         onImageLoad();
     } else {
         p = '';
         if (config.basePath) {
             p = config.basePath;
         }
-        
+
         if (config.dynamic !== true) {
             // Still image
             p = absoluteURL(config.panorama) ? config.panorama : p + config.panorama;
-            
+
             panoImage.onload = function() {
                 window.URL.revokeObjectURL(this.src);  // Clean up
                 onImageLoad();
             };
-            
+
             var xhr = new XMLHttpRequest();
             xhr.onloadend = function() {
                 if (xhr.status != 200) {
@@ -436,7 +436,7 @@ function init() {
             xhr.send();
         }
     }
-    
+
     if (config.draggable)
         uiContainer.classList.add('pnlm-grab');
     uiContainer.classList.remove('pnlm-grabbing');
@@ -457,7 +457,7 @@ function init() {
  */
 function absoluteURL(url) {
     // From http://stackoverflow.com/a/19709846
-    return new RegExp('^(?:[a-z]+:)?//', 'i').test(url) || url[0] == '/' || url.slice(0, 5) == 'blob:';
+    return new RegExp('^(?:[a-z]+:)?//', 'i').test(url) || url[0] === '/' || url.slice(0, 5) === 'blob:';
 }
 
 /**
@@ -537,7 +537,7 @@ function parseGPanoXMP(image, url) {
         var start = img.indexOf('<x:xmpmeta');
         if (start > -1 && config.ignoreGPanoXMP !== true) {
             var xmpData = img.substring(start, img.indexOf('</x:xmpmeta>') + 12);
-            
+
             // Extract the requested tag from the XMP data
             var getTag = function(tag) {
                 var result;
@@ -553,7 +553,7 @@ function parseGPanoXMP(image, url) {
                 }
                 return null;
             };
-            
+
             // Relevant XMP data
             var xmp = {
                 fullWidth: getTag('GPano:FullPanoWidthPixels'),
@@ -565,11 +565,11 @@ function parseGPanoXMP(image, url) {
                 horizonPitch: getTag('GPano:PosePitchDegrees'),
                 horizonRoll: getTag('GPano:PoseRollDegrees')
             };
-            
+
             if (xmp.fullWidth !== null && xmp.croppedWidth !== null &&
                 xmp.fullHeight !== null && xmp.croppedHeight !== null &&
                 xmp.topPixels !== null) {
-                
+
                 // Set up viewer using GPano XMP data
                 if (specifiedPhotoSphereExcludes.indexOf('haov') < 0)
                     config.haov = xmp.croppedWidth / xmp.fullWidth * 360;
@@ -590,11 +590,11 @@ function parseGPanoXMP(image, url) {
                     if (specifiedPhotoSphereExcludes.indexOf('horizonRoll') < 0)
                         config.horizonRoll = xmp.horizonRoll;
                 }
-                
+
                 // TODO: add support for initial view settings
             }
         }
-        
+
         // Load panorama
         panoImage.src = window.URL.createObjectURL(image);
         panoImage.onerror = function() {
@@ -692,11 +692,13 @@ function aboutMessage(event) {
  */
 function mousePosition(event) {
     var bounds = container.getBoundingClientRect();
-    var pos = {};
+	var scaleBy = container.offsetWidth / bounds.width;
+
     // pageX / pageY needed for iOS
-    pos.x = (event.clientX || event.pageX) - bounds.left;
-    pos.y = (event.clientY || event.pageY) - bounds.top;
-    return pos;
+    return {
+    	x: ((event.clientX || event.pageX) - bounds.left) * scaleBy,
+		y: ((event.clientY || event.pageY) - bounds.top) * scaleBy
+    };
 }
 
 /**
@@ -710,12 +712,12 @@ function onDocumentMouseDown(event) {
     event.preventDefault();
     // But not all of it
     container.focus();
-    
+
     // Only do something if the panorama is loaded
     if (!loaded || !config.draggable) {
         return;
     }
-    
+
     // Calculate mouse position relative to top left of viewer container
     var pos = mousePosition(event);
 
@@ -725,7 +727,7 @@ function onDocumentMouseDown(event) {
         console.log('Pitch: ' + coords[0] + ', Yaw: ' + coords[1] + ', Center Pitch: ' +
             config.pitch + ', Center Yaw: ' + config.yaw + ', HFOV: ' + config.hfov);
     }
-    
+
     // Turn off auto-rotation if enabled
     stopAnimation();
 
@@ -736,16 +738,16 @@ function onDocumentMouseDown(event) {
 
     isUserInteracting = true;
     latestInteraction = Date.now();
-    
+
     onPointerDownPointerX = pos.x;
     onPointerDownPointerY = pos.y;
-    
+
     onPointerDownYaw = config.yaw;
     onPointerDownPitch = config.pitch;
-    
+
     uiContainer.classList.add('pnlm-grabbing');
     uiContainer.classList.remove('pnlm-grab');
-    
+
     fireEvent('mousedown', event);
     animateInit();
 }
@@ -778,8 +780,8 @@ function mouseEventToCoords(event) {
     var x = pos.x / canvasWidth * 2 - 1;
     var y = (1 - pos.y / canvasHeight * 2) * canvasHeight / canvasWidth;
     var focal = 1 / Math.tan(config.hfov * Math.PI / 360);
-    var s = Math.sin(config.pitch * Math.PI / 180);
-    var c = Math.cos(config.pitch * Math.PI / 180);
+    var s = Math.sin(toRadians(config.pitch));
+    var c = Math.cos(toRadians(config.pitch));
     var a = focal * c - y * s;
     var root = Math.sqrt(x*x + a*a);
     var pitch = Math.atan((y * c + focal * s) / root) * 180 / Math.PI;
@@ -807,9 +809,9 @@ function onDocumentMouseMove(event) {
         var yaw = ((Math.atan(onPointerDownPointerX / canvasWidth * 2 - 1) - Math.atan(pos.x / canvasWidth * 2 - 1)) * 180 / Math.PI * config.hfov / 90) + onPointerDownYaw;
         speed.yaw = (yaw - config.yaw) % 360 * 0.2;
         config.yaw = yaw;
-        
+
         var vfov = 2 * Math.atan(Math.tan(config.hfov/360*Math.PI) * canvasHeight / canvasWidth) * 180 / Math.PI;
-        
+
         var pitch = ((Math.atan(pos.y / canvasHeight * 2 - 1) - Math.atan(onPointerDownPointerY / canvasHeight * 2 - 1)) * 180 / Math.PI * vfov / 90) + onPointerDownPitch;
         speed.pitch = (pitch - config.pitch) * 0.2;
         config.pitch = pitch;
@@ -862,8 +864,8 @@ function onDocumentTouchStart(event) {
 
     onPointerDownPointerX = pos0.x;
     onPointerDownPointerY = pos0.y;
-    
-    if (event.targetTouches.length == 2) {
+
+    if (event.targetTouches.length === 2) {
         // Down pointer is the center of the two fingers
         var pos1 = mousePosition(event.targetTouches[1]);
         onPointerDownPointerX += (pos1.x - pos0.x) * 0.5;
@@ -873,7 +875,7 @@ function onDocumentTouchStart(event) {
     }
     isUserInteracting = true;
     latestInteraction = Date.now();
-    
+
     onPointerDownYaw = config.yaw;
     onPointerDownPitch = config.pitch;
 
@@ -901,8 +903,8 @@ function onDocumentTouchMove(event) {
         var pos0 = mousePosition(event.targetTouches[0]);
         var clientX = pos0.x;
         var clientY = pos0.y;
-        
-        if (event.targetTouches.length == 2 && onPointerDownPointerDist != -1) {
+
+        if (event.targetTouches.length === 2 && onPointerDownPointerDist != -1) {
             var pos1 = mousePosition(event.targetTouches[1]);
             clientX += (pos1.x - pos0.x) * 0.5;
             clientY += (pos1.y - pos0.y) * 0.5;
@@ -954,7 +956,7 @@ var pointerIDs = [],
  * @param {PointerEvent} event - Document pointer down event.
  */
 function onDocumentPointerDown(event) {
-    if (event.pointerType == 'touch') {
+    if (event.pointerType === 'touch') {
         // Only do something if the panorama is loaded
         if (!loaded || !config.draggable)
             return;
@@ -972,11 +974,11 @@ function onDocumentPointerDown(event) {
  * @param {PointerEvent} event - Document pointer move event.
  */
 function onDocumentPointerMove(event) {
-    if (event.pointerType == 'touch') {
+    if (event.pointerType === 'touch') {
         if (!config.draggable)
             return;
         for (var i = 0; i < pointerIDs.length; i++) {
-            if (event.pointerId == pointerIDs[i]) {
+            if (event.pointerId === pointerIDs[i]) {
                 pointerCoordinates[i].clientX = event.clientX;
                 pointerCoordinates[i].clientY = event.clientY;
                 event.targetTouches = pointerCoordinates;
@@ -994,10 +996,10 @@ function onDocumentPointerMove(event) {
  * @param {PointerEvent} event - Document pointer up event.
  */
 function onDocumentPointerUp(event) {
-    if (event.pointerType == 'touch') {
+    if (event.pointerType === 'touch') {
         var defined = false;
         for (var i = 0; i < pointerIDs.length; i++) {
-            if (event.pointerId == pointerIDs[i])
+            if (event.pointerId === pointerIDs[i])
                 pointerIDs[i] = undefined;
             if (pointerIDs[i])
                 defined = true;
@@ -1018,7 +1020,7 @@ function onDocumentPointerUp(event) {
  */
 function onDocumentMouseWheel(event) {
     // Only do something if the panorama is loaded and mouse wheel zoom is enabled
-    if (!loaded || (config.mouseZoom == 'fullscreenonly' && !fullscreenActive)) {
+    if (!loaded || (config.mouseZoom === 'fullscreenonly' && !fullscreenActive)) {
         return;
     }
 
@@ -1064,9 +1066,9 @@ function onDocumentKeyPress(event) {
     if (config.capturedKeyNumbers.indexOf(keynumber) < 0)
         return;
     event.preventDefault();
-    
+
     // If escape key is pressed
-    if (keynumber == 27) {
+    if (keynumber === 27) {
         // If in fullscreen mode
         if (fullscreenActive) {
             toggleFullscreen();
@@ -1095,12 +1097,12 @@ function clearKeys() {
 function onDocumentKeyUp(event) {
     // Record key pressed
     var keynumber = event.which || event.keycode;
-    
+
     // Override default action for keys that are used
     if (config.capturedKeyNumbers.indexOf(keynumber) < 0)
         return;
     event.preventDefault();
-    
+
     // Change key
     changeKey(keynumber, false);
 }
@@ -1118,53 +1120,53 @@ function changeKey(keynumber, value) {
         case 109: case 189: case 17: case 173:
             if (keysDown[0] != value) { keyChanged = true; }
             keysDown[0] = value; break;
-        
+
         // If plus key is released
         case 107: case 187: case 16: case 61:
             if (keysDown[1] != value) { keyChanged = true; }
             keysDown[1] = value; break;
-        
+
         // If up arrow is released
         case 38:
             if (keysDown[2] != value) { keyChanged = true; }
             keysDown[2] = value; break;
-        
+
         // If "w" is released
         case 87:
             if (keysDown[6] != value) { keyChanged = true; }
             keysDown[6] = value; break;
-        
+
         // If down arrow is released
         case 40:
             if (keysDown[3] != value) { keyChanged = true; }
             keysDown[3] = value; break;
-        
+
         // If "s" is released
         case 83:
             if (keysDown[7] != value) { keyChanged = true; }
             keysDown[7] = value; break;
-        
+
         // If left arrow is released
         case 37:
             if (keysDown[4] != value) { keyChanged = true; }
             keysDown[4] = value; break;
-        
+
         // If "a" is released
         case 65:
             if (keysDown[8] != value) { keyChanged = true; }
             keysDown[8] = value; break;
-        
+
         // If right arrow is released
         case 39:
             if (keysDown[5] != value) { keyChanged = true; }
             keysDown[5] = value; break;
-        
+
         // If "d" is released
         case 68:
             if (keysDown[9] != value) { keyChanged = true; }
             keysDown[9] = value;
     }
-    
+
     if (keyChanged && value) {
         if (typeof performance !== 'undefined' && performance.now()) {
             prevTime = performance.now();
@@ -1191,7 +1193,7 @@ function keyRepeat() {
     var prevPitch = config.pitch;
     var prevYaw = config.yaw;
     var prevZoom = config.hfov;
-    
+
     var newTime;
     if (typeof performance !== 'undefined' && performance.now()) {
         newTime = performance.now();
@@ -1203,40 +1205,40 @@ function keyRepeat() {
     }
     var diff = (newTime - prevTime) * config.hfov / 1700;
     diff = Math.min(diff, 1.0);
-    
+
     // If minus key is down
     if (keysDown[0] && config.keyboardZoom === true) {
         setHfov(config.hfov + (speed.hfov * 0.8 + 0.5) * diff);
         isKeyDown = true;
     }
-    
+
     // If plus key is down
     if (keysDown[1] && config.keyboardZoom === true) {
         setHfov(config.hfov + (speed.hfov * 0.8 - 0.2) * diff);
         isKeyDown = true;
     }
-    
+
     // If up arrow or "w" is down
     if (keysDown[2] || keysDown[6]) {
         // Pan up
         config.pitch += (speed.pitch * 0.8 + 0.2) * diff;
         isKeyDown = true;
     }
-    
+
     // If down arrow or "s" is down
     if (keysDown[3] || keysDown[7]) {
         // Pan down
         config.pitch += (speed.pitch * 0.8 - 0.2) * diff;
         isKeyDown = true;
     }
-    
+
     // If left arrow or "a" is down
     if (keysDown[4] || keysDown[8]) {
         // Pan left
         config.yaw += (speed.yaw * 0.8 - 0.2) * diff;
         isKeyDown = true;
     }
-    
+
     // If right arrow or "d" is down
     if (keysDown[5] || keysDown[9]) {
         // Pan right
@@ -1256,7 +1258,7 @@ function keyRepeat() {
             yawDiff = (-config.autoRotate > 0 ? 1 : -1) * Math.min(Math.abs(config.autoRotate * timeDiff), Math.abs(yawDiff));
             config.yaw += yawDiff;
         }
-        
+
         // Deal with stopping auto rotation after a set delay
         if (config.autoRotateStopDelay) {
             config.autoRotateStopDelay -= newTime - prevTime;
@@ -1306,14 +1308,14 @@ function keyRepeat() {
         speed.yaw = speed.yaw * 0.8 + (config.yaw - prevYaw) / diff * 0.2;
         speed.pitch = speed.pitch * 0.8 + (config.pitch - prevPitch) / diff * 0.2;
         speed.hfov = speed.hfov * 0.8 + (config.hfov - prevZoom) / diff * 0.2;
-        
+
         // Limit speed
         var maxSpeed = config.autoRotate ? Math.abs(config.autoRotate) : 5;
         speed.yaw = Math.min(maxSpeed, Math.max(speed.yaw, -maxSpeed));
         speed.pitch = Math.min(maxSpeed, Math.max(speed.pitch, -maxSpeed));
         speed.hfov = Math.min(maxSpeed, Math.max(speed.hfov, -maxSpeed));
     }
-    
+
     // Stop movement if opposite controls are pressed
     if (keysDown[0] && keysDown[1]) {
         speed.hfov = 0;
@@ -1482,7 +1484,7 @@ function render() {
             }
             config.yaw = Math.max(minYaw, Math.min(maxYaw, config.yaw));
         }
-        
+
         if (!(config.autoRotate !== false)) {
             // When not auto-rotating, this check needs to happen after the
             // previous check (see issue #698)
@@ -1515,11 +1517,16 @@ function render() {
         if (isNaN(maxPitch))
             maxPitch = 90;
         config.pitch = Math.max(minPitch, Math.min(maxPitch, config.pitch));
-        
-        renderer.render(config.pitch * Math.PI / 180, config.yaw * Math.PI / 180, config.hfov * Math.PI / 180, {roll: config.roll * Math.PI / 180});
-        
+
+        renderer.render(
+        	toRadians(config.pitch),
+        	toRadians(config.yaw),
+        	toRadians(config.hfov),
+        	{roll: toRadians(config.roll)}
+        );
+
         renderHotSpots();
-        
+
         // Update compass
         if (config.compass) {
             compass.style.transform = 'rotate(' + (-config.yaw - config.northOffset) + 'deg)';
@@ -1580,9 +1587,9 @@ Quaternion.prototype.toEulerAngles = function() {
  * @returns {Quaternion} Orientation quaternion
  */
 function taitBryanToQuaternion(alpha, beta, gamma) {
-    var r = [beta ? beta * Math.PI / 180 / 2 : 0,
-             gamma ? gamma * Math.PI / 180 / 2 : 0,
-             alpha ? alpha * Math.PI / 180 / 2 : 0];
+    var r = [beta ? toRadians(beta) / 2 : 0,
+             gamma ? toRadians(gamma) / 2 : 0,
+             alpha ? toRadians(alpha) / 2 : 0];
     var c = [Math.cos(r[0]), Math.cos(r[1]), Math.cos(r[2])],
         s = [Math.sin(r[0]), Math.sin(r[1]), Math.sin(r[2])];
 
@@ -1607,7 +1614,7 @@ function computeQuaternion(alpha, beta, gamma) {
     // Apply world transform
     quaternion = quaternion.multiply(new Quaternion(Math.sqrt(0.5), -Math.sqrt(0.5), 0, 0));
     // Apply screen transform
-    var angle = window.orientation ? -window.orientation * Math.PI / 180 / 2 : 0;
+    var angle = window.orientation ? toRadians(-window.orientation) / 2 : 0;
     return quaternion.multiply(new Quaternion(Math.cos(angle), 0, -Math.sin(angle), 0));
 }
 
@@ -1618,7 +1625,7 @@ function computeQuaternion(alpha, beta, gamma) {
  */
 function orientationListener(e) {
     var q = computeQuaternion(e.alpha, e.beta, e.gamma).toEulerAngles();
-    if (typeof(orientation) == 'number' && orientation < 10) {
+    if (typeof(orientation) === 'number' && orientation < 10) {
         // This kludge is necessary because iOS sometimes provides a few stale
         // device orientation events when the listener is removed and then
         // readded. Thus, we skip the first 10 events to prevent this from
@@ -1644,23 +1651,23 @@ function renderInit() {
     try {
         var params = {};
         if (config.horizonPitch !== undefined)
-            params.horizonPitch = config.horizonPitch * Math.PI / 180;
+            params.horizonPitch = toRadians(config.horizonPitch);
         if (config.horizonRoll !== undefined)
-            params.horizonRoll = config.horizonRoll * Math.PI / 180;
+            params.horizonRoll = toRadians(config.horizonRoll);
         if (config.backgroundColor !== undefined)
             params.backgroundColor = config.backgroundColor;
-        renderer.init(panoImage, config.type, config.dynamic, config.haov * Math.PI / 180, config.vaov * Math.PI / 180, config.vOffset * Math.PI / 180, renderInitCallback, params);
+        renderer.init(panoImage, config.type, config.dynamic, toRadians(config.haov), toRadians(config.vaov), toRadians(config.vOffset), renderInitCallback, params);
         if (config.dynamic !== true) {
             // Allow image to be garbage collected
             panoImage = undefined;
         }
     } catch(event) {
         // Panorama not loaded
-        
+
         // Display error if there is a bad texture
-        if (event.type == 'webgl error' || event.type == 'no webgl') {
+        if (event.type === 'webgl error' || event.type === 'no webgl') {
             anError();
-        } else if (event.type == 'webgl size error') {
+        } else if (event.type === 'webgl size error') {
             anError(config.strings.textureSizeError.replace('%s', event.width).replace('%s', event.maxWidth));
         } else {
             anError(config.strings.unknownError);
@@ -1687,17 +1694,17 @@ function renderInitCallback() {
             fireEvent('scenechangefadedone');
         }, config.sceneFadeDuration);
     }
-    
+
     // Show compass if applicable
     if (config.compass) {
         compass.style.display = 'inline';
     } else {
         compass.style.display = 'none';
     }
-    
+
     // Show hotspots
     createHotSpots();
-    
+
     // Hide loading display
     infoDisplay.load.box.style.display = 'none';
     if (preview !== undefined) {
@@ -1705,7 +1712,7 @@ function renderInitCallback() {
         preview = undefined;
     }
     loaded = true;
-    
+
     animateInit();
 
     fireEvent('load');
@@ -1863,17 +1870,19 @@ function destroyHotSpots() {
  * @private
  */
 function renderHotSpot(hs) {
-    var hsPitchSin = Math.sin(hs.pitch * Math.PI / 180),
-        hsPitchCos = Math.cos(hs.pitch * Math.PI / 180),
-        configPitchSin = Math.sin(config.pitch * Math.PI / 180),
-        configPitchCos = Math.cos(config.pitch * Math.PI / 180),
-        yawCos = Math.cos((-hs.yaw + config.yaw) * Math.PI / 180);
+	var rad = toRadians(hs.pitch);
+    var hsPitchSin = Math.sin(rad),
+        hsPitchCos = Math.cos(rad);
+	var myYaw = -hs.yaw + config.yaw;
+    rad = toRadians(config.pitch);
+    var configPitchSin = Math.sin(rad),
+        configPitchCos = Math.cos(rad),
+        yawCos = Math.cos(toRadians(myYaw));
     var z = hsPitchSin * configPitchSin + hsPitchCos * yawCos * configPitchCos;
-    if ((hs.yaw <= 90 && hs.yaw > -90 && z <= 0) ||
-      ((hs.yaw > 90 || hs.yaw <= -90) && z <= 0)) {
+    if (z <= 0)
         hs.div.style.visibility = 'hidden';
-    } else {
-        var yawSin = Math.sin((-hs.yaw + config.yaw) * Math.PI / 180),
+    else {
+        var yawSin = Math.sin(toRadians(myYaw)),
             hfovTan = Math.tan(config.hfov * Math.PI / 360);
         hs.div.style.visibility = 'visible';
         // Subpixel rendering doesn't work in Firefox
@@ -1881,24 +1890,42 @@ function renderHotSpot(hs) {
         var canvas = renderer.getCanvas(),
             canvasWidth = canvas.clientWidth,
             canvasHeight = canvas.clientHeight;
-        var coord = [-canvasWidth / hfovTan * yawSin * hsPitchCos / z / 2,
-            -canvasWidth / hfovTan * (hsPitchSin * configPitchCos -
-            hsPitchCos * yawCos * configPitchSin) / z / 2];
+        var coord = [
+        	-canvasWidth / hfovTan * yawSin * hsPitchCos / z / 2,
+            -canvasWidth / hfovTan * (hsPitchSin * configPitchCos - hsPitchCos * yawCos * configPitchSin) / z / 2
+		];
         // Apply roll
-        var rollSin = Math.sin(config.roll * Math.PI / 180),
-            rollCos = Math.cos(config.roll * Math.PI / 180);
+		rad = toRadians(config.roll);
+        var rollSin = Math.sin(rad),
+            rollCos = Math.cos(rad);
         coord = [coord[0] * rollCos - coord[1] * rollSin,
                  coord[0] * rollSin + coord[1] * rollCos];
         // Apply transform
         coord[0] += (canvasWidth - hs.div.offsetWidth) / 2;
         coord[1] += (canvasHeight - hs.div.offsetHeight) / 2;
+        /*
         var transform = 'translate(' + coord[0] + 'px, ' + coord[1] +
             'px) translateZ(9999px) rotate(' + config.roll + 'deg)';
+
+            REPLACED with some fancier transforms below attempting to make the hotspot
+            stick better to the image as it is rotated. Most contstants determined by
+            trial & error.
+         */
+        var transform = 'translate3d(' + coord[0] + 'px,' + coord[1] + 'px, 0) rotate(' + config.roll + 'deg)';
         if (hs.scale) {
-            transform += ' scale(' + (origHfov/config.hfov) / z + ')';
-        }
+        	var baseScale = (origHfov / config.hfov);
+			baseScale = (baseScale - 1) * 1.7 + 1;
+			// transform += ' scale(' + baseScale + ')';
+			transform += ' scale(' + (baseScale + (1-Math.abs(yawCos))*baseScale*6) + ',' + baseScale + ')';
+		}
+		// var myPitch = -hs.pitch + config.pitch;
+		transform += 'perspective(300px) rotateY(' + myYaw + 'deg) '; // rotateX(' + myPitch + 'deg)
+
+
+        /*
         hs.div.style.webkitTransform = transform;
         hs.div.style.MozTransform = transform;
+        */
         hs.div.style.transform = transform;
     }
 }
@@ -1921,18 +1948,18 @@ function mergeConfig(sceneId) {
     var k, s;
     var photoSphereExcludes = ['haov', 'vaov', 'vOffset', 'northOffset', 'horizonPitch', 'horizonRoll'];
     specifiedPhotoSphereExcludes = [];
-    
+
     // Merge default config
     for (k in defaultConfig) {
         if (defaultConfig.hasOwnProperty(k)) {
             config[k] = defaultConfig[k];
         }
     }
-    
+
     // Merge default scene config
     for (k in initialConfig.default) {
         if (initialConfig.default.hasOwnProperty(k)) {
-            if (k == 'strings') {
+            if (k === 'strings') {
                 for (s in initialConfig.default.strings) {
                     if (initialConfig.default.strings.hasOwnProperty(s)) {
                         config.strings[s] = escapeHTML(initialConfig.default.strings[s]);
@@ -1946,13 +1973,13 @@ function mergeConfig(sceneId) {
             }
         }
     }
-    
+
     // Merge current scene config
     if ((sceneId !== null) && (sceneId !== '') && (initialConfig.scenes) && (initialConfig.scenes[sceneId])) {
         var scene = initialConfig.scenes[sceneId];
         for (k in scene) {
             if (scene.hasOwnProperty(k)) {
-                if (k == 'strings') {
+                if (k === 'strings') {
                     for (s in scene.strings) {
                         if (scene.strings.hasOwnProperty(s)) {
                             config.strings[s] = escapeHTML(scene.strings[s]);
@@ -1968,11 +1995,11 @@ function mergeConfig(sceneId) {
         }
         config.scene = sceneId;
     }
-    
+
     // Merge initial config
     for (k in initialConfig) {
         if (initialConfig.hasOwnProperty(k)) {
-            if (k == 'strings') {
+            if (k === 'strings') {
                 for (s in initialConfig.strings) {
                     if (initialConfig.strings.hasOwnProperty(s)) {
                         config.strings[s] = escapeHTML(initialConfig.strings[s]);
@@ -2039,7 +2066,7 @@ function processOptions(isPreview) {
                 infoDisplay.title.innerHTML = escapeHTML(config[key]);
                 infoDisplay.container.style.display = 'inline';
                 break;
-            
+
             case 'author':
                 var authorText = escapeHTML(config[key]);
                 if (config.authorURL) {
@@ -2052,7 +2079,7 @@ function processOptions(isPreview) {
                 infoDisplay.author.innerHTML = config.strings.bylineLabel.replace('%s', authorText);
                 infoDisplay.container.style.display = 'inline';
                 break;
-            
+
             case 'fallback':
                 var link = document.createElement('a');
                 link.href = sanitizeURL(config[key], true);
@@ -2065,11 +2092,11 @@ function processOptions(isPreview) {
                 infoDisplay.errorMsg.innerHTML = ''; // Removes all children nodes
                 infoDisplay.errorMsg.appendChild(message);
                 break;
-            
+
             case 'hfov':
                 setHfov(Number(config[key]));
                 break;
-            
+
             case 'autoLoad':
                 if (config[key] === true && renderer === undefined) {
                     // Show loading box
@@ -2080,7 +2107,7 @@ function processOptions(isPreview) {
                     init();
                 }
                 break;
-            
+
             case 'showZoomCtrl':
                 if (config[key] && config.showControls != false) {
                     // Show zoom controls
@@ -2094,7 +2121,7 @@ function processOptions(isPreview) {
             case 'showFullscreenCtrl':
                 if (config[key] && config.showControls != false && ('fullscreen' in document || 'mozFullScreen' in document ||
                     'webkitIsFullScreen' in document || 'msFullscreenElement' in document)) {
-                    
+
                     // Show fullscreen control
                     controls.fullscreen.style.display = 'block';
                 } else {
@@ -2224,7 +2251,7 @@ function zoomOut() {
 function constrainHfov(hfov) {
     // Keep field of view within bounds
     var minHfov = config.minHfov;
-    if (config.type == 'multires' && renderer && !config.multiResMinHfov) {
+    if (config.type === 'multires' && renderer && !config.multiResMinHfov) {
         minHfov = Math.min(minHfov, renderer.getCanvas().width / (config.multiRes.cubeResolution / 90 * 0.9));
     }
     if (minHfov > config.maxHfov) {
@@ -2300,11 +2327,11 @@ function loadScene(sceneId, targetPitch, targetYaw, targetHfov, fadeDone) {
         fadeDone = true;    // Don't try to fade when there isn't a scene loaded
     loaded = false;
     animatedMove = {};
-    
+
     // Set up fade if specified
     var fadeImg, workingPitch, workingYaw, workingHfov;
     if (config.sceneFadeDuration && !fadeDone) {
-        var data = renderer.render(config.pitch * Math.PI / 180, config.yaw * Math.PI / 180, config.hfov * Math.PI / 180, {returnImage: true});
+        var data = renderer.render(toRadians(config.pitch), toRadians(config.yaw), toRadians(config.hfov), {returnImage: true});
         if (data !== undefined) {
             fadeImg = new Image();
             fadeImg.className = 'pnlm-fade-img';
@@ -2320,7 +2347,7 @@ function loadScene(sceneId, targetPitch, targetYaw, targetHfov, fadeDone) {
             return;
         }
     }
-    
+
     // Set new pointing
     if (targetPitch === 'same') {
         workingPitch = config.pitch;
@@ -2339,10 +2366,10 @@ function loadScene(sceneId, targetPitch, targetYaw, targetHfov, fadeDone) {
     } else {
         workingHfov = targetHfov;
     }
-    
+
     // Destroy hot spots from previous scene
     destroyHotSpots();
-    
+
     // Create the new config for the scene
     mergeConfig(sceneId);
 
@@ -2384,7 +2411,7 @@ function startOrientation() {
     if (typeof DeviceMotionEvent !== undefined &&
         typeof DeviceMotionEvent.requestPermission === 'function') {
         DeviceOrientationEvent.requestPermission().then(function(response) {
-            if (response == 'granted') {
+            if (response === 'granted') {
                 orientation = 1;
                 window.addEventListener('deviceorientation', orientationListener);
                 controls.orientation.classList.add('pnlm-orientation-button-active');
@@ -2510,11 +2537,11 @@ this.getPitch = function() {
 this.setPitch = function(pitch, animated, callback, callbackArgs) {
     latestInteraction = Date.now();
     if (Math.abs(pitch - config.pitch) <= eps) {
-        if (typeof callback == 'function')
+        if (typeof callback === 'function')
             callback(callbackArgs);
         return this;
     }
-    animated = animated == undefined ? 1000: Number(animated);
+    animated = animated === undefined ? 1000: Number(animated);
     if (animated) {
         animatedMove.pitch = {
             'startTime': Date.now(),
@@ -2522,7 +2549,7 @@ this.setPitch = function(pitch, animated, callback, callbackArgs) {
             'endPosition': pitch,
             'duration': animated
         };
-        if (typeof callback == 'function')
+        if (typeof callback === 'function')
             setTimeout(function(){callback(callbackArgs);}, animated);
     } else {
         config.pitch = pitch;
@@ -2577,11 +2604,11 @@ this.getYaw = function() {
 this.setYaw = function(yaw, animated, callback, callbackArgs) {
     latestInteraction = Date.now();
     if (Math.abs(yaw - config.yaw) <= eps) {
-        if (typeof callback == 'function')
+        if (typeof callback === 'function')
             callback(callbackArgs);
         return this;
     }
-    animated = animated == undefined ? 1000: Number(animated);
+    animated = animated === undefined ? 1000: Number(animated);
     yaw = ((yaw + 180) % 360) - 180; // Keep in bounds
     if (animated) {
         // Animate in shortest direction
@@ -2596,7 +2623,7 @@ this.setYaw = function(yaw, animated, callback, callbackArgs) {
             'endPosition': yaw,
             'duration': animated
         };
-        if (typeof callback == 'function')
+        if (typeof callback === 'function')
             setTimeout(function(){callback(callbackArgs);}, animated);
     } else {
         config.yaw = yaw;
@@ -2651,11 +2678,11 @@ this.getHfov = function() {
 this.setHfov = function(hfov, animated, callback, callbackArgs) {
     latestInteraction = Date.now();
     if (Math.abs(hfov - config.hfov) <= eps) {
-        if (typeof callback == 'function')
+        if (typeof callback === 'function')
             callback(callbackArgs);
         return this;
     }
-    animated = animated == undefined ? 1000: Number(animated);
+    animated = animated === undefined ? 1000: Number(animated);
     if (animated) {
         animatedMove.hfov = {
             'startTime': Date.now(),
@@ -2663,7 +2690,7 @@ this.setHfov = function(hfov, animated, callback, callbackArgs) {
             'endPosition': constrainHfov(hfov),
             'duration': animated
         };
-        if (typeof callback == 'function')
+        if (typeof callback === 'function')
             setTimeout(function(){callback(callbackArgs);}, animated);
     } else {
         setHfov(hfov);
@@ -2709,7 +2736,7 @@ this.setHfovBounds = function(bounds) {
  * @returns {Viewer} `this`
  */
 this.lookAt = function(pitch, yaw, hfov, animated, callback, callbackArgs) {
-    animated = animated == undefined ? 1000: Number(animated);
+    animated = animated === undefined ? 1000: Number(animated);
     if (pitch !== undefined && Math.abs(pitch - config.pitch) > eps) {
         this.setPitch(pitch, animated, callback, callbackArgs);
         callback = undefined;
@@ -2722,7 +2749,7 @@ this.lookAt = function(pitch, yaw, hfov, animated, callback, callbackArgs) {
         this.setHfov(hfov, animated, callback, callbackArgs);
         callback = undefined;
     }
-    if (typeof callback == 'function')
+    if (typeof callback === 'function')
         callback(callbackArgs);
     return this;
 };
@@ -2769,7 +2796,7 @@ this.getHorizonRoll = function() {
  */
 this.setHorizonRoll = function(roll) {
     config.horizonRoll = Math.min(90, Math.max(-90, roll));
-    renderer.setPose(config.horizonPitch * Math.PI / 180, config.horizonRoll * Math.PI / 180);
+    renderer.setPose(toRadians(config.horizonPitch), toRadians(config.horizonRoll));
     animateInit();
     return this;
 };
@@ -2793,7 +2820,7 @@ this.getHorizonPitch = function() {
  */
 this.setHorizonPitch = function(pitch) {
     config.horizonPitch = Math.min(90, Math.max(-90, pitch));
-    renderer.setPose(config.horizonPitch * Math.PI / 180, config.horizonRoll * Math.PI / 180);
+    renderer.setPose(toRadians(config.horizonPitch), toRadians(config.horizonRoll));
     animateInit();
     return this;
 };
@@ -2980,7 +3007,7 @@ this.addHotSpot = function(hs, sceneId) {
         if (initialConfig.scenes.hasOwnProperty(id)) {
             if (!initialConfig.scenes[id].hasOwnProperty('hotSpots')) {
                 initialConfig.scenes[id].hotSpots = []; // Create hot spots array if needed
-                if (id == config.scene)
+                if (id === config.scene)
                     config.hotSpots = initialConfig.scenes[id].hotSpots;    // Link to current config
             }
             initialConfig.scenes[id].hotSpots.push(hs); // Add hot spot to config
@@ -2988,7 +3015,7 @@ this.addHotSpot = function(hs, sceneId) {
             throw 'Invalid scene ID!';
         }
     }
-    if (sceneId === undefined || config.scene == sceneId) {
+    if (sceneId === undefined || config.scene === sceneId) {
         // Add to current scene
         createHotSpot(hs);
         if (loaded)
@@ -3006,7 +3033,7 @@ this.addHotSpot = function(hs, sceneId) {
  * @returns {boolean} True if deletion is successful, else false
  */
 this.removeHotSpot = function(hotSpotId, sceneId) {
-    if (sceneId === undefined || config.scene == sceneId) {
+    if (sceneId === undefined || config.scene === sceneId) {
         if (!config.hotSpots)
             return false;
         for (var i = 0; i < config.hotSpots.length; i++) {
@@ -3132,7 +3159,7 @@ this.off = function(type, listener) {
             // Remove listener if found
             externalEventListeners[type].splice(i, 1);
         }
-        if (externalEventListeners[type].length == 0) {
+        if (externalEventListeners[type].length === 0) {
             // Remove category if empty
             delete externalEventListeners[type];
         }
@@ -3185,6 +3212,11 @@ this.destroy = function() {
     container.innerHTML = '';
     container.classList.remove('pnlm-container');
 };
+
+// Utility, convert degrees to radians
+function toRadians(deg) {
+	return deg * Math.PI / 180;
+}
 
 }
 

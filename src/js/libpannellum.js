@@ -1,17 +1,17 @@
 /*
  * libpannellum - A WebGL and CSS 3D transform based Panorama Renderer
  * Copyright (c) 2012-2020 Matthew Petroff
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -103,7 +103,7 @@ function Renderer(container) {
         var s;
         var faceMissing = false;
         var cubeImgWidth;
-        if (imageType == 'cubemap') {
+        if (imageType === 'cubemap') {
             for (s = 0; s < 6; s++) {
                 if (image[s].width > 0) {
                     if (cubeImgWidth === undefined)
@@ -130,12 +130,12 @@ function Renderer(container) {
                 }
                 var backgroundSquare = new ImageData(imageArray, imgSize, imgSize);
                 for (s = 0; s < 6; s++) {
-                    if (image[s].width == 0)
+                    if (image[s].width === 0)
                         image[s] = backgroundSquare;
                 }
             }
         }
-        
+
         // This awful browser specific test exists because iOS 8/9 and IE 11
         // don't display non-power-of-two cubemap textures but also don't
         // throw an error (tested on an iPhone 5c / iOS 8.1.3 / iOS 9.2 /
@@ -143,7 +143,7 @@ function Renderer(container) {
         // Therefore, the WebGL context is never created for these browsers for
         // NPOT cubemaps, and the CSS 3D transform fallback renderer is used
         // instead.
-        if (!(imageType == 'cubemap' &&
+        if (!(imageType === 'cubemap' &&
             (cubeImgWidth & (cubeImgWidth - 1)) !== 0 &&
             (navigator.userAgent.toLowerCase().match(/(iphone|ipod|ipad).* os 8_/) ||
             navigator.userAgent.toLowerCase().match(/(iphone|ipod|ipad).* os 9_/) ||
@@ -152,17 +152,18 @@ function Renderer(container) {
             // Enable WebGL on canvas
             if (!gl)
                 gl = canvas.getContext('experimental-webgl', {alpha: false, depth: false});
-            if (gl && gl.getError() == 1286)
+            if (gl && gl.getError() === 1286)
                 handleWebGLError1286();
         }
-        
+
         // If there is no WebGL, fall back to CSS 3D transform renderer.
         // This will discard the image loaded so far and load the fallback image.
         // While browser specific tests are usually frowned upon, the
         // fallback viewer only really works with WebKit/Blink and IE 10/11
         // (it doesn't work properly in Firefox).
-        if (!gl && ((imageType == 'multires' && image.hasOwnProperty('fallbackPath')) ||
-            imageType == 'cubemap') &&
+        /*
+        if (!gl && ((imageType === 'multires' && image.hasOwnProperty('fallbackPath')) ||
+            imageType === 'cubemap') &&
             ('WebkitAppearance' in document.documentElement.style ||
             navigator.userAgent.match(/Trident.*rv[ :]*11\./) ||
             navigator.appVersion.indexOf('MSIE 10') !== -1)) {
@@ -170,11 +171,11 @@ function Renderer(container) {
             if (world) {
                 container.removeChild(world);
             }
-            
+
             // Initialize renderer
             world = document.createElement('div');
             world.className = 'pnlm-world';
-            
+
             // Add images
             var path;
             if (image.basePath) {
@@ -197,7 +198,7 @@ function Renderer(container) {
                 faceContext.drawImage(this, 2, 2);
                 var imgData = faceContext.getImageData(0, 0, faceCanvas.width, faceCanvas.height);
                 var data = imgData.data;
-                
+
                 // Duplicate edge pixels
                 var i;
                 var j;
@@ -237,10 +238,10 @@ function Renderer(container) {
                     data[(faceCanvas.width * (faceCanvas.height - 1)) * 4 + j] = data[(faceCanvas.width * (faceCanvas.height - 2) + 1) * 4 + j];
                     data[(faceCanvas.width * faceCanvas.height - 1) * 4 + j] = data[(faceCanvas.width * (faceCanvas.height - 1) - 2) * 4 + j];
                 }
-                
+
                 // Draw image width duplicated edge pixels on canvas
                 faceContext.putImageData(imgData, 0, 0);
-                
+
                 incLoaded.call(this);
             };
             var incLoaded = function() {
@@ -252,7 +253,7 @@ function Renderer(container) {
                 } else
                     faceMissing = true;
                 loaded++;
-                if (loaded == 6) {
+                if (loaded === 6) {
                     fallbackImgSize = this.width;
                     container.appendChild(world);
                     callback();
@@ -265,7 +266,7 @@ function Renderer(container) {
                 faceImg.side = s;
                 faceImg.onload = onLoad;
                 faceImg.onerror = incLoaded; // ignore missing face to support partial fallback image
-                if (imageType == 'multires') {
+                if (imageType === 'multires') {
                     faceImg.src = path.replace('%s', sides[s]) + '.' + image.extension;
                 } else {
                     faceImg.src = image[s].src;
@@ -273,11 +274,12 @@ function Renderer(container) {
             }
             fillMissingFaces(fallbackImgSize);
             return;
-        } else if (!gl) {
+        } else */
+        if (!gl) {
             console.log('Error: no WebGL support detected!');
             throw {type: 'no webgl'};
         }
-        if (imageType == 'cubemap')
+        if (imageType === 'cubemap')
             fillMissingFaces(cubeImgWidth);
         if (image.basePath) {
             image.fullpath = image.basePath + image.path;
@@ -285,24 +287,24 @@ function Renderer(container) {
             image.fullpath = image.path;
         }
         image.invTileResolution = 1 / image.tileResolution;
-        
+
         var vertices = createCube();
         vtmps = [];
         for (s = 0; s < 6; s++) {
             vtmps[s] = vertices.slice(s * 12, s * 12 + 12);
             vertices = createCube();
         }
-        
+
         // Make sure image isn't too big
         var maxWidth = 0;
-        if (imageType == 'equirectangular') {
+        if (imageType === 'equirectangular') {
             maxWidth = gl.getParameter(gl.MAX_TEXTURE_SIZE);
             if (Math.max(image.width / 2, image.height) > maxWidth) {
                 console.log('Error: The image is too big; it\'s ' + image.width + 'px wide, '+
                             'but this device\'s maximum supported size is ' + (maxWidth * 2) + 'px.');
                 throw {type: 'webgl size error', width: image.width, maxWidth: maxWidth * 2};
             }
-        } else if (imageType == 'cubemap') {
+        } else if (imageType === 'cubemap') {
             if (cubeImgWidth > gl.getParameter(gl.MAX_CUBE_MAP_TEXTURE_SIZE)) {
                 console.log('Error: The image is too big; it\'s ' + cubeImgWidth + 'px wide, ' +
                             'but this device\'s maximum supported size is ' + maxWidth + 'px.');
@@ -336,7 +338,7 @@ function Renderer(container) {
         // Create vertex shader
         vs = gl.createShader(gl.VERTEX_SHADER);
         var vertexSrc = v;
-        if (imageType == 'multires') {
+        if (imageType === 'multires') {
             vertexSrc = vMulti;
         }
         gl.shaderSource(vs, vertexSrc);
@@ -345,10 +347,10 @@ function Renderer(container) {
         // Create fragment shader
         fs = gl.createShader(gl.FRAGMENT_SHADER);
         var fragmentSrc = fragEquirectangular;
-        if (imageType == 'cubemap') {
+        if (imageType === 'cubemap') {
             glBindType = gl.TEXTURE_CUBE_MAP;
             fragmentSrc = fragCube;
-        } else if (imageType == 'multires') {
+        } else if (imageType === 'multires') {
             fragmentSrc = fragMulti;
         }
         gl.shaderSource(fs, fragmentSrc);
@@ -409,7 +411,7 @@ function Renderer(container) {
             gl.uniform1f(program.vo, voffset / Math.PI * 2);
 
             // Set background color
-            if (imageType == 'equirectangular') {
+            if (imageType === 'equirectangular') {
                 program.backgroundColor = gl.getUniformLocation(program, 'u_backgroundColor');
                 gl.uniform4fv(program.backgroundColor, color.concat([1]));
             }
@@ -419,7 +421,7 @@ function Renderer(container) {
             gl.bindTexture(glBindType, program.texture);
 
             // Upload images to texture depending on type
-            if (imageType == 'cubemap') {
+            if (imageType === 'cubemap') {
                 // Load all six sides of the cube map
                 gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image[1]);
                 gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_X, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image[3]);
@@ -551,7 +553,7 @@ function Renderer(container) {
         canvas.width = canvas.clientWidth * pixelRatio;
         canvas.height = canvas.clientHeight * pixelRatio;
         if (gl) {
-            if (gl.getError() == 1286)
+            if (gl.getError() === 1286)
                 handleWebGLError1286();
             gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
             if (imageType != 'multires') {
@@ -572,7 +574,7 @@ function Renderer(container) {
     this.setPose = function(horizonPitch, horizonRoll) {
         horizonPitch = isNaN(horizonPitch) ? 0 : Number(horizonPitch);
         horizonRoll = isNaN(horizonRoll) ? 0 : Number(horizonRoll);
-        if (horizonPitch == 0 && horizonRoll == 0)
+        if (horizonPitch === 0 && horizonRoll === 0)
             pose = undefined;
         else
             pose = [horizonPitch, horizonRoll];
@@ -585,7 +587,7 @@ function Renderer(container) {
      * @param {number} pitch - Pitch to render at (in radians).
      * @param {number} yaw - Yaw to render at (in radians).
      * @param {number} hfov - Horizontal field of view to render with (in radians).
-     * @param {Object} [params] - Extra configuration parameters. 
+     * @param {Object} [params] - Extra configuration parameters.
      * @param {number} [params.roll] - Camera roll (in radians).
      * @param {boolean} [params.returnImage] - Return rendered image?
      */
@@ -631,10 +633,10 @@ function Renderer(container) {
         }
 
         // If no WebGL
-        if (!gl && (imageType == 'multires' || imageType == 'cubemap')) {
+        if (!gl && (imageType === 'multires' || imageType === 'cubemap')) {
             // Determine face transforms
             s = fallbackImgSize / 2;
-            
+
             var transforms = {
                 f: 'translate3d(-' + (s + 2) + 'px, -' + (s + 2) + 'px, -' + s + 'px)',
                 b: 'translate3d(' + (s + 2) + 'px, -' + (s + 2) + 'px, ' + s + 'px) rotateX(180deg) rotateZ(180deg)',
@@ -646,7 +648,7 @@ function Renderer(container) {
             focal = 1 / Math.tan(hfov / 2);
             var zoom = focal * canvas.clientWidth / 2 + 'px';
             var transform = 'perspective(' + zoom + ') translateZ(' + zoom + ') rotateX(' + pitch + 'rad) rotateY(' + yaw + 'rad) ';
-            
+
             // Apply face transforms
             var faces = Object.keys(transforms);
             for (i = 0; i < 6; i++) {
@@ -658,7 +660,7 @@ function Renderer(container) {
             }
             return;
         }
-        
+
         if (imageType != 'multires') {
             // Calculate focal length from vertical field of view
             var vfov = 2 * Math.atan(Math.tan(hfov * 0.5) / (gl.drawingBufferWidth / gl.drawingBufferHeight));
@@ -669,36 +671,36 @@ function Renderer(container) {
             gl.uniform1f(program.theta, pitch);
             gl.uniform1f(program.rot, roll);
             gl.uniform1f(program.f, focal);
-            
+
             if (dynamic === true) {
                 // Update texture if dynamic
-                if (imageType == 'equirectangular') {
+                if (imageType === 'equirectangular') {
                     gl.bindTexture(gl.TEXTURE_2D, program.texture);
                     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
                 }
             }
-            
+
             // Draw using current buffer
             gl.drawArrays(gl.TRIANGLES, 0, 6);
-        
+
         } else {
             // Create perspective matrix
             var perspMatrix = makePersp(hfov, gl.drawingBufferWidth / gl.drawingBufferHeight, 0.1, 100.0);
-            
+
             // Find correct zoom level
             checkZoom(hfov);
-            
+
             // Create rotation matrix
             var matrix = identityMatrix3();
             matrix = rotateMatrix(matrix, -roll, 'z');
             matrix = rotateMatrix(matrix, -pitch, 'x');
             matrix = rotateMatrix(matrix, yaw, 'y');
             matrix = makeMatrix4(matrix);
-            
+
             // Set matrix uniforms
             gl.uniformMatrix4fv(program.perspUniform, false, new Float32Array(transposeMatrix4(perspMatrix)));
             gl.uniformMatrix4fv(program.cubeUniform, false, new Float32Array(transposeMatrix4(matrix)));
-            
+
             // Find current nodes
             var rotPersp = rotatePersp(perspMatrix, matrix);
             program.nodeCache.sort(multiresNodeSort);
@@ -712,15 +714,15 @@ function Renderer(container) {
                 }
             }
             program.currentNodes = [];
-            
+
             var sides = ['f', 'b', 'u', 'd', 'l', 'r'];
             for (s = 0; s < 6; s++) {
                 var ntmp = new MultiresNode(vtmps[s], sides[s], 1, 0, 0, image.fullpath);
                 testMultiresNode(rotPersp, ntmp, pitch, yaw, hfov);
             }
-            
+
             program.currentNodes.sort(multiresNodeRenderSort);
-            
+
             // Unqueue any pending requests for nodes that are no longer visible
             for (i = pendingTextureRequests.length - 1; i >= 0; i--) {
                 if (program.currentNodes.indexOf(pendingTextureRequests[i].node) === -1) {
@@ -728,31 +730,31 @@ function Renderer(container) {
                     pendingTextureRequests.splice(i, 1);
                 }
             }
-            
+
             // Allow one request to be pending, so that we can create a texture buffer for that in advance of loading actually beginning
             if (pendingTextureRequests.length === 0) {
                 for (i = 0; i < program.currentNodes.length; i++) {
                     var node = program.currentNodes[i];
                     if (!node.texture && !node.textureLoad) {
                         node.textureLoad = true;
-            
+
                         setTimeout(processNextTile, 0, node);
-                        
+
                         // Only process one tile per frame to improve responsiveness
                         break;
                     }
                 }
             }
-            
+
             // Draw tiles
             multiresDraw();
         }
-        
+
         if (params.returnImage !== undefined) {
             return canvas.toDataURL('image/png');
         }
     };
-    
+
     /**
      * Check if images are loading.
      * @memberof Renderer
@@ -760,7 +762,7 @@ function Renderer(container) {
      * @returns {boolean} Whether or not images are loading.
      */
     this.isLoading = function() {
-        if (gl && imageType == 'multires') {
+        if (gl && imageType === 'multires') {
             for ( var i = 0; i < program.currentNodes.length; i++ ) {
                 if (!program.currentNodes[i].textureLoaded) {
                     return true;
@@ -769,7 +771,7 @@ function Renderer(container) {
         }
         return false;
     };
-    
+
     /**
      * Retrieve renderer's canvas.
      * @memberof Renderer
@@ -779,7 +781,7 @@ function Renderer(container) {
     this.getCanvas = function() {
         return canvas;
     };
-    
+
     /**
      * Sorting method for multires nodes.
      * @private
@@ -789,17 +791,17 @@ function Renderer(container) {
      */
     function multiresNodeSort(a, b) {
         // Base tiles are always first
-        if (a.level == 1 && b.level != 1) {
+        if (a.level === 1 && b.level != 1) {
             return -1;
         }
-        if (b. level == 1 && a.level != 1) {
+        if (b. level === 1 && a.level != 1) {
             return 1;
         }
-        
+
         // Higher timestamp first
         return b.timestamp - a.timestamp;
     }
-    
+
     /**
      * Sorting method for multires node rendering.
      * @private
@@ -812,11 +814,11 @@ function Renderer(container) {
         if (a.level != b.level) {
             return a.level - b.level;
         }
-        
+
         // Lower distance from center first
         return a.diff - b.diff;
     }
-    
+
     /**
      * Draws multires nodes.
      * @private
@@ -829,16 +831,16 @@ function Renderer(container) {
                 if (program.currentNodes[i].textureLoaded > 1) {
                     //var color = program.currentNodes[i].color;
                     //gl.uniform4f(program.colorUniform, color[0], color[1], color[2], 1.0);
-                    
+
                     // Bind vertex buffer and pass vertices to WebGL
                     gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertBuf);
                     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(program.currentNodes[i].vertices), gl.STATIC_DRAW);
                     gl.vertexAttribPointer(program.vertPosLocation, 3, gl.FLOAT, false, 0, 0);
-                    
+
                     // Prep for texture
                     gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertTexCoordBuf);
                     gl.vertexAttribPointer(program.texCoordLocation, 2, gl.FLOAT, false, 0, 0);
-                    
+
                     // Bind texture and draw tile
                     gl.bindTexture(gl.TEXTURE_2D, program.currentNodes[i].texture); // Bind program.currentNodes[i].texture to TEXTURE0
                     gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
@@ -892,11 +894,11 @@ function Renderer(container) {
             ydiff += (ydiff > Math.PI) ? -2 * Math.PI : (ydiff < -Math.PI) ? 2 * Math.PI : 0;
             ydiff = Math.abs(ydiff);
             node.diff = Math.acos(Math.sin(pitch) * Math.sin(theta) + Math.cos(pitch) * Math.cos(theta) * Math.cos(ydiff));
-            
+
             // Add node to current nodes and load texture if needed
             var inCurrent = false;
             for (var k = 0; k < program.nodeCache.length; k++) {
-                if (program.nodeCache[k].path == node.path) {
+                if (program.nodeCache[k].path === node.path) {
                     inCurrent = true;
                     program.nodeCache[k].timestamp = program.nodeCacheTimestamp++;
                     program.nodeCache[k].diff = node.diff;
@@ -910,7 +912,7 @@ function Renderer(container) {
                 program.currentNodes.push(node);
                 program.nodeCache.push(node);
             }
-            
+
             // TODO: Test error
             // Create child nodes
             if (node.level < program.level) {
@@ -925,7 +927,7 @@ function Renderer(container) {
                     doubleTileSize = image.tileResolution * 2;
                 }
                 var f = 0.5;
-                if (node.x == numTiles || node.y == numTiles) {
+                if (node.x === numTiles || node.y === numTiles) {
                     f = 1.0 - image.tileResolution / (image.tileResolution + lastTileSize);
                 }
                 var i = 1.0 - f;
@@ -934,17 +936,17 @@ function Renderer(container) {
                 var f1 = f, f2 = f, f3 = f, i1 = i, i2 = i, i3 = i;
                 // Handle non-symmetric tiles
                 if (lastTileSize < image.tileResolution) {
-                    if (node.x == numTiles && node.y != numTiles) {
+                    if (node.x === numTiles && node.y != numTiles) {
                         f2 = 0.5;
                         i2 = 0.5;
-                        if (node.side == 'd' || node.side == 'u') {
+                        if (node.side === 'd' || node.side === 'u') {
                             f3 = 0.5;
                             i3 = 0.5;
                         }
-                    } else if (node.x != numTiles && node.y == numTiles) {
+                    } else if (node.x != numTiles && node.y === numTiles) {
                         f1 = 0.5;
                         i1 = 0.5;
-                        if (node.side == 'l' || node.side == 'r') {
+                        if (node.side === 'l' || node.side === 'r') {
                             f3 = 0.5;
                             i3 = 0.5;
                         }
@@ -952,24 +954,24 @@ function Renderer(container) {
                 }
                 // Handle small tiles that have fewer than four children
                 if (doubleTileSize <= image.tileResolution) {
-                    if (node.x == numTiles) {
+                    if (node.x === numTiles) {
                         f1 = 0;
                         i1 = 1;
-                        if (node.side == 'l' || node.side == 'r') {
+                        if (node.side === 'l' || node.side === 'r') {
                             f3 = 0;
                             i3 = 1;
                         }
                     }
-                    if (node.y == numTiles) {
+                    if (node.y === numTiles) {
                         f2 = 0;
                         i2 = 1;
-                        if (node.side == 'd' || node.side == 'u') {
+                        if (node.side === 'd' || node.side === 'u') {
                             f3 = 0;
                             i3 = 1;
                         }
                     }
                 }
-                
+
                 vtmp = [           v[0],             v[1],             v[2],
                         v[0]*f1+v[3]*i1,    v[1]*f+v[4]*i,  v[2]*f3+v[5]*i3,
                         v[0]*f1+v[6]*i1,  v[1]*f2+v[7]*i2,  v[2]*f3+v[8]*i3,
@@ -977,7 +979,7 @@ function Renderer(container) {
                 ];
                 ntmp = new MultiresNode(vtmp, node.side, node.level + 1, node.x*2, node.y*2, image.fullpath);
                 children.push(ntmp);
-                if (!(node.x == numTiles && doubleTileSize <= image.tileResolution)) {
+                if (!(node.x === numTiles && doubleTileSize <= image.tileResolution)) {
                     vtmp = [v[0]*f1+v[3]*i1,    v[1]*f+v[4]*i,  v[2]*f3+v[5]*i3,
                                        v[3],             v[4],             v[5],
                               v[3]*f+v[6]*i,  v[4]*f2+v[7]*i2,  v[5]*f3+v[8]*i3,
@@ -986,8 +988,8 @@ function Renderer(container) {
                     ntmp = new MultiresNode(vtmp, node.side, node.level + 1, node.x*2+1, node.y*2, image.fullpath);
                     children.push(ntmp);
                 }
-                if (!(node.x == numTiles && doubleTileSize <= image.tileResolution) &&
-                    !(node.y == numTiles && doubleTileSize <= image.tileResolution)) {
+                if (!(node.x === numTiles && doubleTileSize <= image.tileResolution) &&
+                    !(node.y === numTiles && doubleTileSize <= image.tileResolution)) {
                     vtmp = [v[0]*f1+v[6]*i1,  v[1]*f2+v[7]*i2,  v[2]*f3+v[8]*i3,
                               v[3]*f+v[6]*i,  v[4]*f2+v[7]*i2,  v[5]*f3+v[8]*i3,
                                        v[6],             v[7],             v[8],
@@ -996,7 +998,7 @@ function Renderer(container) {
                     ntmp = new MultiresNode(vtmp, node.side, node.level + 1, node.x*2+1, node.y*2+1, image.fullpath);
                     children.push(ntmp);
                 }
-                if (!(node.y == numTiles && doubleTileSize <= image.tileResolution)) {
+                if (!(node.y === numTiles && doubleTileSize <= image.tileResolution)) {
                     vtmp = [  v[0]*f+v[9]*i, v[1]*f2+v[10]*i2, v[2]*f3+v[11]*i3,
                             v[0]*f1+v[6]*i1,  v[1]*f2+v[7]*i2,  v[2]*f3+v[8]*i3,
                             v[9]*f1+v[6]*i1,   v[10]*f+v[7]*i, v[11]*f3+v[8]*i3,
@@ -1011,7 +1013,7 @@ function Renderer(container) {
             }
         }
     }
-    
+
     /**
      * Creates cube vertex array.
      * @private
@@ -1026,7 +1028,7 @@ function Renderer(container) {
                  1,  1, -1,  1,  1,  1,  1, -1,  1,  1, -1, -1  // Right face
         ];
     }
-    
+
     /**
      * Creates 3x3 identity matrix.
      * @private
@@ -1039,7 +1041,7 @@ function Renderer(container) {
             0, 0, 1
         ];
     }
-    
+
     /**
      * Rotates a 3x3 matrix.
      * @private
@@ -1051,21 +1053,21 @@ function Renderer(container) {
     function rotateMatrix(m, angle, axis) {
         var s = Math.sin(angle);
         var c = Math.cos(angle);
-        if (axis == 'x') {
+        if (axis === 'x') {
             return [
                 m[0], c*m[1] + s*m[2], c*m[2] - s*m[1],
                 m[3], c*m[4] + s*m[5], c*m[5] - s*m[4],
                 m[6], c*m[7] + s*m[8], c*m[8] - s*m[7]
             ];
         }
-        if (axis == 'y') {
+        if (axis === 'y') {
             return [
                 c*m[0] - s*m[2], m[1], c*m[2] + s*m[0],
                 c*m[3] - s*m[5], m[4], c*m[5] + s*m[3],
                 c*m[6] - s*m[8], m[7], c*m[8] + s*m[6]
             ];
         }
-        if (axis == 'z') {
+        if (axis === 'z') {
             return [
                 c*m[0] + s*m[1], c*m[1] - s*m[0], m[2],
                 c*m[3] + s*m[4], c*m[4] - s*m[3], m[5],
@@ -1073,7 +1075,7 @@ function Renderer(container) {
             ];
         }
     }
-    
+
     /**
      * Turns a 3x3 matrix into a 4x4 matrix.
      * @private
@@ -1088,7 +1090,7 @@ function Renderer(container) {
                0,    0,    0,    1
         ];
     }
-    
+
     /**
      * Transposes a 4x4 matrix.
      * @private
@@ -1103,7 +1105,7 @@ function Renderer(container) {
             m[ 3], m[ 7], m[11], m[15]
         ];
     }
-    
+
     /**
      * Creates a perspective matrix.
      * @private
@@ -1123,7 +1125,7 @@ function Renderer(container) {
                    0,   0, -1,  0
         ];
     }
-    
+
     /**
      * Processes a loaded texture image into a WebGL texture.
      * @private
@@ -1139,7 +1141,7 @@ function Renderer(container) {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         gl.bindTexture(gl.TEXTURE_2D, null);
     }
-    
+
     var pendingTextureRequests = [];
 
     // Based on http://blog.tojicode.com/2012/03/javascript-memory-optimization-and.html
@@ -1212,7 +1214,7 @@ function Renderer(container) {
             node.textureLoaded = loaded ? 2 : 1;
         }, globalParams.crossOrigin);
     }
-    
+
     /**
      * Finds and applies optimal multires zoom level.
      * @private
@@ -1226,11 +1228,11 @@ function Renderer(container) {
             Math.pow(2, newLevel - 1) * Math.tan(hfov / 2) * 0.707 ) {
             newLevel++;
         }
-        
+
         // Apply change
         program.level = newLevel;
     }
-    
+
     /**
      * Rotates perspective matrix.
      * @private
@@ -1246,7 +1248,7 @@ function Renderer(container) {
                  -r[8],      -r[9],      -r[10],     0
         ];
     }
-    
+
     /**
      * Applies rotated perspective matrix to a 3-vector
      * (last element is inverted).
@@ -1263,7 +1265,7 @@ function Renderer(container) {
                  1/(m[12]*v[0] + m[13]*v[1] + m[14]*v[2])
         ];
     }
-    
+
     /**
      * Checks if a vertex is visible.
      * @private
@@ -1278,7 +1280,7 @@ function Renderer(container) {
         var winY = vpp[1]*vpp[3];
         var winZ = vpp[2]*vpp[3];
         var ret = [0, 0, 0];
-        
+
         if ( winX < -1 )
             ret[0] = -1;
         if ( winX > 1 )
@@ -1291,7 +1293,7 @@ function Renderer(container) {
             ret[2] = 1;
         return ret;
     }
-    
+
     /**
      * Checks if a square (tile) is visible.
      * @private
@@ -1305,14 +1307,14 @@ function Renderer(container) {
         var check3 = checkInView(m, v.slice(6, 9));
         var check4 = checkInView(m, v.slice(9, 12));
         var testX = check1[0] + check2[0] + check3[0] + check4[0];
-        if ( testX == -4 || testX == 4 )
+        if ( testX === -4 || testX === 4 )
             return false;
         var testY = check1[1] + check2[1] + check3[1] + check4[1];
-        if ( testY == -4 || testY == 4 )
+        if ( testY === -4 || testY === 4 )
             return false;
         var testZ = check1[2] + check2[2] + check3[2] + check4[2];
         return testZ != 4;
-        
+
 
     }
 
@@ -1337,7 +1339,7 @@ var v = [
 'void main() {',
     // Set position
     'gl_Position = vec4(a_texCoord, 0.0, 1.0);',
-    
+
     // Pass the coordinates to the fragment shader
     'v_texCoord = a_texCoord;',
 '}'
@@ -1356,7 +1358,7 @@ var vMulti = [
 'void main(void) {',
     // Set position
     'gl_Position = u_perspMatrix * u_cubeMatrix * vec4(a_vertCoord, 1.0);',
-    
+
     // Pass the coordinates to the fragment shader
     'v_texCoord = a_texCoord;',
 '}'

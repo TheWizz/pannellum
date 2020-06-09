@@ -1,0 +1,26 @@
+{
+	"compilerOptions": {
+		"target": "es6",
+		"module": "ESNext",
+		"noImplicitAny": true,
+		"suppressImplicitAnyIndexErrors": true,
+		"noEmitHelpers": true,
+		"importHelpers": true,
+		"experimentalDecorators": true,
+		"sourceMap": true,
+		"rootDir":".",
+		"skipLibCheck": true,
+		"baseUrl": "."
+	},
+	"exclude": [
+		"build",
+		"bower_components",
+		"dist",
+		"img",
+		"node_modules"
+	],
+	"include": [
+		"**/*"
+	],
+	"typeRoots" : ["./types"]
+}
