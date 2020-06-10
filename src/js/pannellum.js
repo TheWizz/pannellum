@@ -398,6 +398,7 @@ function init() {
                 parseGPanoXMP(img, p);
                 infoDisplay.load.msg.innerHTML = '';
             };
+            /*	PIXI
             xhr.onprogress = function(e) {
                 if (e.lengthComputable) {
                     // Display progress
@@ -424,6 +425,7 @@ function init() {
                     infoDisplay.load.lbar.style.display = 'none';
                 }
             };
+            */
             try {
                 xhr.open('GET', p, true);
             } catch (e) {
@@ -2046,6 +2048,7 @@ function processOptions(isPreview) {
             config.author = config.previewAuthor;
     }
 
+	/*	PIXI removed
     // Reset title / author display
     if (!config.hasOwnProperty('title'))
         infoDisplay.title.innerHTML = '';
@@ -2057,6 +2060,7 @@ function processOptions(isPreview) {
     // Fill in load button label and loading box text
     controls.load.innerHTML = '<p>' + config.strings.loadButtonLabel + '</p>';
     infoDisplay.load.boxp.innerHTML = config.strings.loadingLabel;
+	*/
 
     // Process other options
     for (var key in config) {
@@ -3015,12 +3019,12 @@ this.addHotSpot = function(hs, sceneId) {
             throw 'Invalid scene ID!';
         }
     }
-    if (sceneId === undefined || config.scene === sceneId) {
+    if (sceneId !== undefined && config.scene === sceneId) {
         // Add to current scene
         createHotSpot(hs);
         if (loaded)
             renderHotSpot(hs);
-    }
+    }	// Else this happens through renderInitCallback
     return this;
 };
 
